@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/App/Src/app_fsm_task.c 
+../Core/App/Src/app_fsm_task.c \
+../Core/App/Src/maxim_ds18b20_port.c 
 
 OBJS += \
-./Core/App/Src/app_fsm_task.o 
+./Core/App/Src/app_fsm_task.o \
+./Core/App/Src/maxim_ds18b20_port.o 
 
 C_DEPS += \
-./Core/App/Src/app_fsm_task.d 
+./Core/App/Src/app_fsm_task.d \
+./Core/App/Src/maxim_ds18b20_port.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ Core/App/Src/%.o Core/App/Src/%.su: ../Core/App/Src/%.c Core/App/Src/subdir.mk
 clean: clean-Core-2f-App-2f-Src
 
 clean-Core-2f-App-2f-Src:
-	-$(RM) ./Core/App/Src/app_fsm_task.d ./Core/App/Src/app_fsm_task.o ./Core/App/Src/app_fsm_task.su
+	-$(RM) ./Core/App/Src/app_fsm_task.d ./Core/App/Src/app_fsm_task.o ./Core/App/Src/app_fsm_task.su ./Core/App/Src/maxim_ds18b20_port.d ./Core/App/Src/maxim_ds18b20_port.o ./Core/App/Src/maxim_ds18b20_port.su
 
 .PHONY: clean-Core-2f-App-2f-Src
 

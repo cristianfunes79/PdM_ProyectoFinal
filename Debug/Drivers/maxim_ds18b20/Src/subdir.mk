@@ -5,16 +5,13 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Drivers/maxim_ds18b20/Src/maxim_ds18b20.c \
-../Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.c 
+../Drivers/maxim_ds18b20/Src/maxim_ds18b20.c 
 
 OBJS += \
-./Drivers/maxim_ds18b20/Src/maxim_ds18b20.o \
-./Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.o 
+./Drivers/maxim_ds18b20/Src/maxim_ds18b20.o 
 
 C_DEPS += \
-./Drivers/maxim_ds18b20/Src/maxim_ds18b20.d \
-./Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.d 
+./Drivers/maxim_ds18b20/Src/maxim_ds18b20.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -24,7 +21,7 @@ Drivers/maxim_ds18b20/Src/%.o Drivers/maxim_ds18b20/Src/%.su: ../Drivers/maxim_d
 clean: clean-Drivers-2f-maxim_ds18b20-2f-Src
 
 clean-Drivers-2f-maxim_ds18b20-2f-Src:
-	-$(RM) ./Drivers/maxim_ds18b20/Src/maxim_ds18b20.d ./Drivers/maxim_ds18b20/Src/maxim_ds18b20.o ./Drivers/maxim_ds18b20/Src/maxim_ds18b20.su ./Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.d ./Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.o ./Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.su
+	-$(RM) ./Drivers/maxim_ds18b20/Src/maxim_ds18b20.d ./Drivers/maxim_ds18b20/Src/maxim_ds18b20.o ./Drivers/maxim_ds18b20/Src/maxim_ds18b20.su
 
 .PHONY: clean-Drivers-2f-maxim_ds18b20-2f-Src
 
