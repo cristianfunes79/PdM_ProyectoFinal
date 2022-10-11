@@ -37,6 +37,20 @@ static uint8_t commands[COMMAND_LAST] = { 	0xF0, /* SEARCH_ROM 		*/
 								            0xB4, /* READ_POWER_SUPPLY	*/
 							            };
 
+typedef enum
+{
+	DS_TEMPERATURE_LSB=0,
+	DS_TEMPERATURE_MSB,
+	DS_TH_REG_USER,
+	DS_TL_REG_USER,
+	DS_CONFIGURATION,
+	DS_RESERVED_0,
+	DS_RESERVED_1,
+	DS_RESERVED_2,
+	DS_CRC_REG,
+	DS_SCRATCHPAD_SIZE
+} scratchpad_mem_t;
+
 /*
  * @brief	Ejecuta un comando de reset.
  * @param	port es el puerto donde se conecta el sensor oneWire.
@@ -149,6 +163,29 @@ static void send_command(oneWire_t* port, oneWire_command_t command)
     write_byte(port, commands[command]);
 }
 
+/*
+ * @brief	Calcula el crc de los datos leidos de la memoria del sensor.
+ * @param	addr es un puntero a los valores de memoria leidos del sensor.
+ * @param	len es el numero de elementos de la memoria del sensor.
+ * @retval	retorna el valor calculado de crc.
+ */
+static uint8_t dsCRC8(const uint8_t *addr, uint8_t len)
+{
+    uint8_t crc = 0;
+    while (len--)
+    {
+        uint8_t inbyte = *addr++;
+        for (uint8_t i = 8; i; i--)
+        {
+            uint8_t mix = (crc ^ inbyte) & 0x01;
+            crc >>= 1;
+            if (mix) crc ^= 0x8C;
+            inbyte >>= 1;
+        }
+    }
+    return crc;
+}
+
 /* Public functions ----------------------------------------*/
 
 /*
@@ -168,8 +205,21 @@ bool sensor_is_present(oneWire_t* port)
  */
 oneWire_status_t get_temperature(oneWire_t* port)
 {
+	// La secuencia de comandos para trabajar con el sensor ds18b20 es la siguiente:
+	//		1- Inicializacion
+	//		2- Enviar ROM Command.
+	//		3- Enviar Function Command.
+	//
+	// Para realizar la conversion y posterior lectura de temperatura se debe:
+	//		1- Ejecutar reset del bus.
+	//		2- Enviar comando SKIP_ROM. Este comando se usa cuando hay un solo sensor conectado al bus.
+	//		3- Enviar comando de conversion de temperatura.
+	//		4- Volver a ejecutar reset.
+	//		5- Volver a enviar SKIP_ROM.
+	//		6- Leer la memoria del sensor (scratchpad).
+
     oneWire_status_t status = DS_NACK;
-    uint8_t scratchpad_mem[9];
+    uint8_t scratchpad_mem[DS_SCRATCHPAD_SIZE];
 
     if (one_wire_reset(port))
     {
@@ -180,15 +230,23 @@ oneWire_status_t get_temperature(oneWire_t* port)
         {
             send_command(port, SKIP_ROM);
             send_command(port, READ_SCRATCHPAD);
+            // Luego de enviar el comando read scratchpad, se pueden leer los 8bytes
+            // del scratchpad + 1byte de CRC.
             for(uint8_t i=0; i<9; ++i) scratchpad_mem[i] = read_byte(port);
-            uint16_t LSB = scratchpad_mem[0];
-            uint16_t MSB = scratchpad_mem[1];
+            uint16_t LSB = scratchpad_mem[DS_TEMPERATURE_LSB];
+            uint16_t MSB = scratchpad_mem[DS_TEMPERATURE_MSB];
             one_wire_reset(port);
 
-            port->temperature = (MSB<<8) | LSB;
-            //TODO: check crc
-            port->temperature /= 16.0;
-            status = DS_OK;
+            if (dsCRC8(scratchpad_mem, 8) == scratchpad_mem[DS_CRC_REG])
+            {
+            	port->temperature = (MSB<<8) | LSB;
+            	port->temperature /= 16.0;
+            	status = DS_OK;
+            }
+            else
+            {
+            	status = DS_CRC_ERROR;
+            }
         }
     }
 
