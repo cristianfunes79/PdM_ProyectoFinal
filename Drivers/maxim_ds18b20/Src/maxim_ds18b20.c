@@ -233,14 +233,19 @@ oneWire_status_t get_temperature(oneWire_t* port)
             // Luego de enviar el comando read scratchpad, se pueden leer los 8bytes
             // del scratchpad + 1byte de CRC.
             for(uint8_t i=0; i<9; ++i) scratchpad_mem[i] = read_byte(port);
+            uint8_t sign = scratchpad_mem[DS_TEMPERATURE_MSB]&0x80;
             uint16_t LSB = scratchpad_mem[DS_TEMPERATURE_LSB];
             uint16_t MSB = scratchpad_mem[DS_TEMPERATURE_MSB];
             one_wire_reset(port);
 
             if (dsCRC8(scratchpad_mem, 8) == scratchpad_mem[DS_CRC_REG])
             {
-            	port->temperature = (MSB<<8) | LSB;
-            	port->temperature /= 16.0;
+            	int16_t temp = (MSB<<8) | LSB;
+            	if (sign)
+            	{
+            		temp = ((temp^0xffff) +1)*-1;
+            	}
+            	port->temperature = temp/16.0;
             	status = DS_OK;
             }
             else
