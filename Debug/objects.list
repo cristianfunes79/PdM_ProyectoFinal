@@ -1,5 +1,6 @@
 "./Core/Src/main.o"
 "./Core/Startup/startup_stm32f429zitx.o"
+"./Drivers/API/Src/API_delayUs.o"
 "./Drivers/Core/Src/gpio.o"
 "./Drivers/Core/Src/stm32f4xx_hal_msp.o"
 "./Drivers/Core/Src/stm32f4xx_it.o"
@@ -25,3 +26,4 @@
 "./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.o"
 "./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o"
 "./Drivers/maxim_ds18b20/Src/maxim_ds18b20.o"
+"./Drivers/maxim_ds18b20/Src/maxim_ds18b20_port.o"

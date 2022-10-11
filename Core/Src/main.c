@@ -18,10 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "maxim_ds18b20.h"
+#include "maxim_ds18b20_port.h"
+#include "API_delayUs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -30,11 +30,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct
-{
-	GPIO_TypeDef* settings;
-	uint16_t pin;
-}GenericGPIO_t;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -49,11 +45,6 @@ typedef struct
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-void delay_us(uint32_t delay)
-{
-	  __HAL_TIM_SET_COUNTER(&htim7, 0);
-	  while (__HAL_TIM_GET_COUNTER(&htim7) < delay);
-}
 
 void delay_ms(uint32_t delay)
 {
@@ -63,35 +54,7 @@ void delay_ms(uint32_t delay)
 	}
 }
 
-void set_gpio_low(void* gpio)
-{
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	HAL_GPIO_WritePin(((GenericGPIO_t*)gpio)->settings, ((GenericGPIO_t*)gpio)->pin, GPIO_PIN_RESET);
-	/*Configure GPIO pin : DS18B20_PORT1_Pin */
-	GPIO_InitStruct.Pin = ((GenericGPIO_t*)gpio)->pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(((GenericGPIO_t*)gpio)->settings, &GPIO_InitStruct);
-	//HAL_GPIO_WritePin(DS18B20_PORT1_GPIO_Port, DS18B20_PORT1_Pin, GPIO_PIN_RESET);
-}
-
-void set_gpio_input(void* gpio)
-{
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-	/*Configure GPIO pin : DS18B20_PORT1_Pin */
-	GPIO_InitStruct.Pin = ((GenericGPIO_t*)gpio)->pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(((GenericGPIO_t*)gpio)->settings, &GPIO_InitStruct);
-}
-
-bool read_gpio(void* gpio)
-{
-	return (HAL_GPIO_ReadPin(((GenericGPIO_t*)gpio)->settings,((GenericGPIO_t*)gpio)->pin) == GPIO_PIN_SET) ? true : false;
-}
 
 /* USER CODE END PV */
 
@@ -113,14 +76,6 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	GenericGPIO_t oneWirePort = {	.settings=DS18B20_Port_GPIO_Port, .pin=DS18B20_Port_Pin};
-	oneWire_t oneWire = {
-			.one_wire_pulldown = set_gpio_low,
-			.one_wire_read = read_gpio,
-			.one_wire_release = set_gpio_input,
-			.delay_us = delay_us,
-			.port = &oneWirePort
-	};
 
   /* USER CODE END 1 */
 
@@ -143,9 +98,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
-  MX_TIM7_Init();
+  //MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
-
+  delay_us_init();
+  ds18b20_port_init(DS18B20_Port_GPIO_Port, DS18B20_Port_Pin);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -153,15 +109,17 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if(one_wire_reset(&oneWire)) HAL_UART_Transmit(&huart3, (uint8_t*)"Sensor Found!!\n", 15, 100);
+	  float temp;
+
+	  if(ds18b20_port_is_present()) HAL_UART_Transmit(&huart3, (uint8_t*)"Sensor Found!!\n", 15, 100);
 	  else HAL_UART_Transmit(&huart3, (uint8_t*)"Sensor NOT Found!!\n", 19, 100);
 	  delay_ms(5000);
-	  get_temperature(&oneWire);
+	  ds18b20_port_get_temperature(&temp);
 
 	  uint8_t data[10];
 
-	  uint8_t parte_entera = (uint8_t)oneWire.temperature;
-	  uint8_t parte_decimal = 10.0*oneWire.temperature - 10*parte_entera;
+	  uint8_t parte_entera = (uint8_t)temp;
+	  uint8_t parte_decimal = 10.0*temp - 10*parte_entera;
 
   #if 1
 	  data[0] = parte_entera/10 + '0';

@@ -12,6 +12,7 @@ RM := rm -rf
 -include Drivers/maxim_ds18b20/Src/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Drivers/Core/Src/subdir.mk
+-include Drivers/API/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include objects.mk

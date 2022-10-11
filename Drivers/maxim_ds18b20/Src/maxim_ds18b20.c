@@ -7,13 +7,39 @@
 
 #include "maxim_ds18b20.h"
 
-#define static
+typedef enum
+{
+	SEARCH_ROM = 0,
+	READ_ROM,
+    MATCH_ROM,
+    SKIP_ROM,
+    ALARM_SEARCH,
+    CONVERT_T,
+    WRITE_SCRATCHPAD,
+    READ_SCRATCHPAD,
+    COPY_SCRATCHPAD,
+    RECALL_EE,
+    READ_POWER_SUPPLY,
+    COMMAND_LAST
+} oneWire_command_t;
+
+static uint8_t commands[COMMAND_LAST] = { 	0xF0, /* SEARCH_ROM 		*/
+								            0x33, /* READ_ROM 			*/
+								            0x55, /* MATCH_ROM 			*/
+								            0xCC, /* SKIP_ROM 			*/
+								            0xEC, /* ALARM_SEARCH		*/
+								            0x44, /* CONVERT_T			*/
+								            0x4E, /* WRITE_SCRATCHPAD	*/
+								            0xBE, /* READ_SCRATCHPAD	*/
+								            0x48, /* COPY_SCRATCHPAD	*/
+								            0xB8, /* RECALL_EE			*/
+								            0xB4, /* READ_POWER_SUPPLY	*/
+							            };
 
 static bool one_wire_reset(oneWire_t* port)
 {
 	bool ack = false;
 
-	//port->set_output(port->port);
 	port->one_wire_pulldown(port->port);
 	port->delay_us(480);
 	port->one_wire_release(port->port);
@@ -33,7 +59,6 @@ static void write_lsb(oneWire_t* port, uint8_t data)
 {
 	if ( data & 0x1)
 	{
-		//port->set_output(port->port);
 		port->one_wire_pulldown(port->port);
 		port->delay_us(6);
 		port->one_wire_release(port->port);
@@ -41,7 +66,6 @@ static void write_lsb(oneWire_t* port, uint8_t data)
 	}
     else
 	{
-    	//port->set_output(port->port);
 		port->one_wire_pulldown(port->port);
 		port->delay_us(60);
 		port->one_wire_release(port->port);
@@ -53,7 +77,6 @@ static uint8_t read_lsb(oneWire_t* port)
 {
     uint8_t lsb = 0;
 
-    //port->set_output(port->port);
     port->one_wire_pulldown(port->port);
     port->delay_us(6);
     port->one_wire_release(port->port);
@@ -87,7 +110,17 @@ static uint8_t read_byte(oneWire_t* port)
     return rbyte;
 }
 
+static void send_command(oneWire_t* port, oneWire_command_t command)
+{
+    write_byte(port, commands[command]);
+}
 
+
+
+bool sensor_is_present(oneWire_t* port)
+{
+    return one_wire_reset(port);
+}
 
 oneWire_status_t get_temperature(oneWire_t* port)
 {
@@ -96,13 +129,13 @@ oneWire_status_t get_temperature(oneWire_t* port)
 
     if (one_wire_reset(port))
     {
-        write_byte(port, 0xCC);
-        write_byte(port, 0x44);
+        send_command(port, SKIP_ROM);
+        send_command(port, CONVERT_T);
         while(!port->one_wire_read(port));
         if (one_wire_reset(port))
         {
-            write_byte(port, 0xCC);
-            write_byte(port, 0xBE);
+            send_command(port, SKIP_ROM);
+            send_command(port, READ_SCRATCHPAD);
             for(uint8_t i=0; i<9; ++i) scratchpad_mem[i] = read_byte(port);
             uint16_t LSB = scratchpad_mem[0];
             uint16_t MSB = scratchpad_mem[1];
