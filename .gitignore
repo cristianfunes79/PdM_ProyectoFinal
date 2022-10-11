@@ -1,0 +1,6 @@
+*.d
+*.su
+*.o
+*.elf
+*.list
+*.map
