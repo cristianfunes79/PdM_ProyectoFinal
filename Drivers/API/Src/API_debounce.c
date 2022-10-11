@@ -5,10 +5,11 @@
  *      Author: Cristian Funes
  */
 #include "API_debounce.h"
+#include "API_delay.h"
 #include "stm32f4xx_nucleo_144.h" 	/* <- BSP include */
 
 /* Private macros ------------------------------------------------------------------------ */
-#define DELAY_DEBOUNCING_MS 40  // Retardo en ms para pasar al proximo led en la secuencia
+#define DELAY_DEBOUNCING_MS 40  // Retardo en ms del antirrebote
 
 /* Private definitions ------------------------------------------------------------------- */
 typedef enum
@@ -25,8 +26,20 @@ static delay_t delayDebouncing;
 static bool_t fallingEdge;
 
 /* Private functions ------------------------------------------------------------------------ */
-static void Error_Handler(void);
 
+/*
+ * @brief	Error handler para la fsm
+ * @retval	None
+ */
+static void Debounce_Error_Handler(void)
+{
+	while(1);
+}
+
+/*
+ * @brief	Setea una flag interna en caso de que se presione el boton de usuario
+ * @retval 	None
+ */
 static void buttonPressed(void)
 {
 	fallingEdge = true;
@@ -41,7 +54,7 @@ static void buttonPressed(void)
  * @params 	None
  * @retval	true or false, dependiendo el valor de la variable leida
  */
-bool_t readKey(void)
+bool readKey(void)
 {
 	bool_t state = fallingEdge;
 	if (fallingEdge) fallingEdge = false;
@@ -49,7 +62,7 @@ bool_t readKey(void)
 }
 
 /*
- * @brief Inicializa la maquina de estados
+ * @brief Inicializa la maquina de estados del anti rebote
  * @params None
  * @retval None
  */
@@ -102,13 +115,8 @@ void debounceFSM_update(void)
 			}
 			break;
 		default:
-			Error_Handler();
+			Debounce_Error_Handler();
 			break;
 	}
-}
-
-static void Error_Handler(void)
-{
-	while(1);
 }
 

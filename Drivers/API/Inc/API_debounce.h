@@ -8,7 +8,7 @@
 #ifndef API_INC_API_DEBOUNCE_H_
 #define API_INC_API_DEBOUNCE_H_
 
-#include "API_delay.h"
+#include <stdbool.h>
 
 /*
  * @brief Inicializa la maquina de estados
@@ -30,6 +30,6 @@ void debounceFSM_update(void);
  * @params 	None
  * @retval	true or false, dependiendo el valor de la variable leida
  */
-bool_t readKey(void);
+bool readKey(void);
 
 #endif /* API_INC_API_DEBOUNCE_H_ */

@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Drivers/Core/Src/board_init.c \
 ../Drivers/Core/Src/gpio.c \
 ../Drivers/Core/Src/stm32f4xx_hal_msp.c \
 ../Drivers/Core/Src/stm32f4xx_it.c \
@@ -15,6 +16,7 @@ C_SRCS += \
 ../Drivers/Core/Src/usart.c 
 
 OBJS += \
+./Drivers/Core/Src/board_init.o \
 ./Drivers/Core/Src/gpio.o \
 ./Drivers/Core/Src/stm32f4xx_hal_msp.o \
 ./Drivers/Core/Src/stm32f4xx_it.o \
@@ -25,6 +27,7 @@ OBJS += \
 ./Drivers/Core/Src/usart.o 
 
 C_DEPS += \
+./Drivers/Core/Src/board_init.d \
 ./Drivers/Core/Src/gpio.d \
 ./Drivers/Core/Src/stm32f4xx_hal_msp.d \
 ./Drivers/Core/Src/stm32f4xx_it.d \
@@ -42,7 +45,7 @@ Drivers/Core/Src/%.o Drivers/Core/Src/%.su: ../Drivers/Core/Src/%.c Drivers/Core
 clean: clean-Drivers-2f-Core-2f-Src
 
 clean-Drivers-2f-Core-2f-Src:
-	-$(RM) ./Drivers/Core/Src/gpio.d ./Drivers/Core/Src/gpio.o ./Drivers/Core/Src/gpio.su ./Drivers/Core/Src/stm32f4xx_hal_msp.d ./Drivers/Core/Src/stm32f4xx_hal_msp.o ./Drivers/Core/Src/stm32f4xx_hal_msp.su ./Drivers/Core/Src/stm32f4xx_it.d ./Drivers/Core/Src/stm32f4xx_it.o ./Drivers/Core/Src/stm32f4xx_it.su ./Drivers/Core/Src/syscalls.d ./Drivers/Core/Src/syscalls.o ./Drivers/Core/Src/syscalls.su ./Drivers/Core/Src/sysmem.d ./Drivers/Core/Src/sysmem.o ./Drivers/Core/Src/sysmem.su ./Drivers/Core/Src/system_stm32f4xx.d ./Drivers/Core/Src/system_stm32f4xx.o ./Drivers/Core/Src/system_stm32f4xx.su ./Drivers/Core/Src/tim.d ./Drivers/Core/Src/tim.o ./Drivers/Core/Src/tim.su ./Drivers/Core/Src/usart.d ./Drivers/Core/Src/usart.o ./Drivers/Core/Src/usart.su
+	-$(RM) ./Drivers/Core/Src/board_init.d ./Drivers/Core/Src/board_init.o ./Drivers/Core/Src/board_init.su ./Drivers/Core/Src/gpio.d ./Drivers/Core/Src/gpio.o ./Drivers/Core/Src/gpio.su ./Drivers/Core/Src/stm32f4xx_hal_msp.d ./Drivers/Core/Src/stm32f4xx_hal_msp.o ./Drivers/Core/Src/stm32f4xx_hal_msp.su ./Drivers/Core/Src/stm32f4xx_it.d ./Drivers/Core/Src/stm32f4xx_it.o ./Drivers/Core/Src/stm32f4xx_it.su ./Drivers/Core/Src/syscalls.d ./Drivers/Core/Src/syscalls.o ./Drivers/Core/Src/syscalls.su ./Drivers/Core/Src/sysmem.d ./Drivers/Core/Src/sysmem.o ./Drivers/Core/Src/sysmem.su ./Drivers/Core/Src/system_stm32f4xx.d ./Drivers/Core/Src/system_stm32f4xx.o ./Drivers/Core/Src/system_stm32f4xx.su ./Drivers/Core/Src/tim.d ./Drivers/Core/Src/tim.o ./Drivers/Core/Src/tim.su ./Drivers/Core/Src/usart.d ./Drivers/Core/Src/usart.o ./Drivers/Core/Src/usart.su
 
 .PHONY: clean-Drivers-2f-Core-2f-Src
 

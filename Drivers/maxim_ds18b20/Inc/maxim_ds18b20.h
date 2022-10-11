@@ -11,26 +11,43 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/*
+ * @brief	Estado de la operacion con el sensor.
+ */
 typedef enum
 {
-    OK,
-    NACK,
-    CRC_ERROR
+    DS_OK,
+    DS_NACK,
+    DS_CRC_ERROR
 } oneWire_status_t; //result returned in read temp
 
+/*
+ * @brief	Esta estructura se usa como interfaz para poder portar el driver a distintas arquitecturas
+ */
 typedef struct
 {
-	void (*one_wire_pulldown) (void*);  // pulls to 0
-	bool (*one_wire_read) (void*);      // reads
-	void (*one_wire_release) (void*);   // releases bus, set as input
-	void (*delay_us) (uint16_t);
+	void (*one_wire_pulldown) (void*);  // Setea el puerto como salida en estado bajo
+	bool (*one_wire_read) (void*);      // Lee el estado del puerto
+	void (*one_wire_release) (void*);   // Setea el puerto como entrada para liberar el bus
+	void (*delay_us) (uint16_t);		// Retardo en microsegundos
 
-	void * port; // pointer to gpio
+	void * port; 						// Puntero a la estructura de datos correspondiente para manejar gpios
 
-    float temperature;
+    float temperature;					// Guarda el valor leido de temperatura para el puerto especificado
 } oneWire_t;
 
+/*
+ * @brief	Realiza la conversion y lectura de temperatura del sensor oneWire.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval	DS_OK en caso de que se realice una operacion exitosa y ERROR en caso contrario.
+ */
 oneWire_status_t get_temperature(oneWire_t* port);
+
+/*
+ * @brief	Checkea si se encuentra conectado un sensor en el puerto oneWire.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval	true si se encuentra un sensor y false de lo contrario.
+ */
 bool sensor_is_present(oneWire_t* port);
 
 #endif /* MAXIM_DS18B20_INC_MAXIM_DS18B20_H_ */

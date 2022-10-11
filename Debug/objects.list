@@ -6,6 +6,7 @@
 "./Drivers/API/Src/API_delayUs.o"
 "./Drivers/API/Src/API_uart.o"
 "./Drivers/BSP/STM32F4xx_Nucleo_144/stm32f4xx_nucleo_144.o"
+"./Drivers/Core/Src/board_init.o"
 "./Drivers/Core/Src/gpio.o"
 "./Drivers/Core/Src/stm32f4xx_hal_msp.o"
 "./Drivers/Core/Src/stm32f4xx_it.o"

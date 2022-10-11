@@ -7,6 +7,7 @@
 
 #include "maxim_ds18b20.h"
 
+/* Private definitions -------------------------------*/
 typedef enum
 {
 	SEARCH_ROM = 0,
@@ -36,6 +37,11 @@ static uint8_t commands[COMMAND_LAST] = { 	0xF0, /* SEARCH_ROM 		*/
 								            0xB4, /* READ_POWER_SUPPLY	*/
 							            };
 
+/*
+ * @brief	Ejecuta un comando de reset.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval  true si se detecta un sensor conectado y false de lo contrario.
+ */
 static bool one_wire_reset(oneWire_t* port)
 {
 	bool ack = false;
@@ -55,6 +61,12 @@ static bool one_wire_reset(oneWire_t* port)
 	return ack;
 }
 
+/*
+ * @brief	Escribe el bit menos significativo del byte que se desea.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @param 	data es el dato cuyo bit menos significativo se desea enviar.
+ * @retval 	None
+ */
 static void write_lsb(oneWire_t* port, uint8_t data)
 {
 	if ( data & 0x1)
@@ -73,6 +85,11 @@ static void write_lsb(oneWire_t* port, uint8_t data)
 	}
 }
 
+/*
+ * @brief	Lee un bit por el puerto oneWire
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval	bit leido en el puerto oneWire
+ */
 static uint8_t read_lsb(oneWire_t* port)
 {
     uint8_t lsb = 0;
@@ -89,6 +106,12 @@ static uint8_t read_lsb(oneWire_t* port)
     return lsb;
 }
 
+/*
+ * @brief	Escribe un byte completo por el puerto oneWire
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @para 	data es el byte que se desea enviar
+ * @retval 	None
+ */
 static void write_byte(oneWire_t* port, uint8_t data)
 {
     for (uint8_t i=0; i<8; ++i)
@@ -97,6 +120,11 @@ static void write_byte(oneWire_t* port, uint8_t data)
     }
 }
 
+/*
+ * @brief	Lee un byte completo por el puerto oneWire.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval	byte leido por el puerto oneWire.
+ */
 static uint8_t read_byte(oneWire_t* port)
 {
     uint8_t rbyte = 0x00;
@@ -110,21 +138,37 @@ static uint8_t read_byte(oneWire_t* port)
     return rbyte;
 }
 
+/*
+ * @brief	Envia un comando a traves del puerto oneWire.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @param	command es el comando que se desea enviar.
+ * @retval	None
+ */
 static void send_command(oneWire_t* port, oneWire_command_t command)
 {
     write_byte(port, commands[command]);
 }
 
+/* Public functions ----------------------------------------*/
 
-
+/*
+ * @brief	Checkea si se encuentra conectado un sensor en el puerto oneWire.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval	true si se encuentra un sensor y false de lo contrario.
+ */
 bool sensor_is_present(oneWire_t* port)
 {
     return one_wire_reset(port);
 }
 
+/*
+ * @brief	Realiza la conversion y lectura de temperatura del sensor oneWire.
+ * @param	port es el puerto donde se conecta el sensor oneWire.
+ * @retval	DS_OK en caso de que se realice una operacion exitosa y ERROR en caso contrario.
+ */
 oneWire_status_t get_temperature(oneWire_t* port)
 {
-    oneWire_status_t status = NACK;
+    oneWire_status_t status = DS_NACK;
     uint8_t scratchpad_mem[9];
 
     if (one_wire_reset(port))
@@ -144,7 +188,7 @@ oneWire_status_t get_temperature(oneWire_t* port)
             port->temperature = (MSB<<8) | LSB;
             //TODO: check crc
             port->temperature /= 16.0;
-            status = OK;
+            status = DS_OK;
         }
     }
 
