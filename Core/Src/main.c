@@ -22,6 +22,8 @@
 #include "gpio.h"
 #include "maxim_ds18b20_port.h"
 #include "API_delayUs.h"
+#include "API_delay.h"
+#include "app_fsm_task.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -45,14 +47,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
-void delay_ms(uint32_t delay)
-{
-	for (uint32_t i=0; i<delay; ++i)
-	{
-		delay_us(1000);
-	}
-}
 
 
 
@@ -102,6 +96,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   delay_us_init();
   ds18b20_port_init(DS18B20_Port_GPIO_Port, DS18B20_Port_Pin);
+  app_fsm_task_init();
+  API_uart_send((char*)"Reading Sensor1 \n",17);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,32 +105,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  float temp;
-
-	  if(ds18b20_port_is_present()) HAL_UART_Transmit(&huart3, (uint8_t*)"Sensor Found!!\n", 15, 100);
-	  else HAL_UART_Transmit(&huart3, (uint8_t*)"Sensor NOT Found!!\n", 19, 100);
-	  delay_ms(5000);
-	  ds18b20_port_get_temperature(&temp);
-
-	  uint8_t data[10];
-
-	  uint8_t parte_entera = (uint8_t)temp;
-	  uint8_t parte_decimal = 10.0*temp - 10*parte_entera;
-
-  #if 1
-	  data[0] = parte_entera/10 + '0';
-	  data[1] = parte_entera%10 + '0';
-	  data[2] = '.';
-	  data[3] = parte_decimal + '0';
-  #else
-	  data[0] = 1+'0';
-	  data[1] = 2+'0';
-	  data[2] = '.';
-	  data[3] = 3+'0';
-  #endif
-	  data[4] = '\n';
-	  HAL_UART_Transmit(&huart3, data, 5, 100);
-	  delay_ms(2000);
+	app_fsm_task_next_state();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

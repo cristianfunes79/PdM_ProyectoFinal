@@ -12,9 +12,11 @@ RM := rm -rf
 -include Drivers/maxim_ds18b20/Src/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Drivers/Core/Src/subdir.mk
+-include Drivers/BSP/STM32F4xx_Nucleo_144/subdir.mk
 -include Drivers/API/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
+-include Core/App/Src/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -64,7 +66,7 @@ main-build: proyectoCESE_PdM.elf secondary-outputs
 
 # Tool invocations
 proyectoCESE_PdM.elf proyectoCESE_PdM.map: $(OBJS) $(USER_OBJS) /home/cfunes/CESE/PdM/STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "proyectoCESE_PdM.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/cfunes/CESE/PdM/STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="proyectoCESE_PdM.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "proyectoCESE_PdM.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/cfunes/CESE/PdM/STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="proyectoCESE_PdM.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

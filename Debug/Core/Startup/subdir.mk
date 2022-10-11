@@ -16,7 +16,7 @@ S_DEPS += \
 
 # Each subdirectory must supply rules for building sources it contributes
 Core/Startup/%.o: ../Core/Startup/%.s Core/Startup/subdir.mk
-	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -I"/home/cfunes/CESE/PdM/Drivers/Core/Inc" -I"/home/cfunes/CESE/PdM/Drivers/maxim_ds18b20" -I"/home/cfunes/CESE/PdM/Drivers/maxim_ds18b20/Inc" -I"/home/cfunes/CESE/PdM/Drivers/API/Inc" -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -I"/home/cfunes/CESE/PdM/Drivers/Core/Inc" -I"/home/cfunes/CESE/PdM/Drivers/maxim_ds18b20" -I"/home/cfunes/CESE/PdM/Drivers/maxim_ds18b20/Inc" -I"/home/cfunes/CESE/PdM/Drivers/API/Inc" -I"/home/cfunes/CESE/PdM/Core/App/Inc" -I"/home/cfunes/CESE/PdM/Drivers/BSP/STM32F4xx_Nucleo_144" -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
 
 clean: clean-Core-2f-Startup
 
